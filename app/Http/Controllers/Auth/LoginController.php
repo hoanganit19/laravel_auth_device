@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Notifications\OtpNotification;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -48,9 +50,13 @@ class LoginController extends Controller
         $this->clearLoginAttempts($request);
 
         if ($response = $this->authenticated($request, $this->guard()->user())) {
-
             return $response;
         }
+
+        //Xử lý gửi OTP
+        $otp = generateOtp($request->email);
+        Notification::route('mail', $request->email)->notify(new OtpNotification($otp));
+        return redirect()->route('2fa');
 
         $sessionId = $request->session()->getId();
         $user = $request->user();
