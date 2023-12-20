@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Notifications\OtpNotification;
 use Illuminate\Support\Facades\Notification;
@@ -34,6 +35,5 @@ Route::get('/test-otp', function () {
     Notification::route('mail', 'contact@unicode.vn')->notify(new OtpNotification($otp));
 });
 
-Route::get('/2fa', function () {
-    return '<h2>2FA</h2>';
-})->name('2fa');
+Route::get('/2fa', [LoginController::class, 'get2FaForm'])->name('2fa');
+Route::post('/2fa', [LoginController::class, 'handle2Fa']);
